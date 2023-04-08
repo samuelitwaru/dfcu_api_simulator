@@ -1,6 +1,6 @@
 <template>
-  <q-page class="flex-center">
-    <div class="q-pa-sm">
+  <q-page class="flex flex-center">
+    <div class="q-pa-sm" style="min-width: 20rem">
       <div class="q-pb-md">
         <label class="text-subtitle1">Enter API URL</label>
         <q-input v-model="apiURL" type="text" label="https://api.example.com" />
