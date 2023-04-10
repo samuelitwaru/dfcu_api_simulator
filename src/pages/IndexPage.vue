@@ -2,7 +2,7 @@
   <q-page class="flex flex-center">
     <div class="q-pa-sm" style="min-width: 20rem">
       <div class="q-pb-md">
-        <label class="text-subtitle1">Enter API URL</label>
+        <label class="text-subtitle1">API Base URL</label>
         <q-input v-model="apiURL" type="text" label="https://api.example.com" />
       </div>
 
@@ -65,6 +65,17 @@
           label="Responses"
           outlined
         />
+        <div align="right" v-if="responseData">
+          <q-btn
+            icon="download"
+            color="primary"
+            dense
+            class="q-mt-sm"
+            label="download response logs"
+            @click="downloadResponse"
+          />
+        </div>
+
         <!-- </q-card> -->
       </div>
     </div>
@@ -79,6 +90,7 @@ export default defineComponent({
   data() {
     return {
       apiURL: "https://dfcu.pythonanywhere.com",
+      // apiURL: "http://127.0.0.1:8000",
       accNo1: "1234567890",
       accNo2: "0987654321",
       accNo3: "2121212121",
@@ -117,6 +129,35 @@ export default defineComponent({
             this.responseData += `Account Number: ${accNo} \n${err.message} \n------------------------------------------------\n`;
           });
       }
+    },
+
+    downloadResponse() {
+      const options = {
+        baseURL: this.apiURL,
+      };
+      this.$api
+        .post(`/api/download-response`, { content: this.responseData }, options)
+        .then((res) => {
+          // this.fileURL = res.data.file_url;
+          fetch(res.data.file_url)
+            .then((response) => response.text())
+            .then((text) => {
+              const link = document.createElement("a");
+              link.setAttribute(
+                "href",
+                "data:text/plain;charset=utf-8," + encodeURIComponent(text)
+              );
+              link.setAttribute("download", "response.txt");
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+            });
+          // var tag = document.getElementById("fileURL");
+          // tag.click();
+        })
+        .catch((err) => {
+          console.log(err.message);
+        });
     },
   },
 });
